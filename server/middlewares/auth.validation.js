@@ -10,11 +10,6 @@ const authValidation = async (req, res, next) => {
             .messages({
                 "any.required": "email address is required",
             }),
-        mobile: Joi.string()
-            .min(7)
-            .max(15)
-            .regex(/^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/)
-            .required(),
         password: Joi.string()
             .min(8)
             .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/)
