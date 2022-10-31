@@ -11,11 +11,30 @@ exports.signUp = async (req, res, next) => {
         const user = await authServices.registerService({ ...req.body, token: verificationToken });
         if (!user) throw error();
 
-        let template = emailTemplate(verificationToken);
-        const { requestId } = await emailServices.sendEmail("Email verification", verificationToken, user.email);
-        if (!requestId) throw error();
+        console.log(user);
+        // let template = emailTemplate(verificationToken);
+        // const { requestId } = await emailServices.sendEmail("Email verification", verificationToken, user.email);
+        // if (!requestId) throw error();
 
-        return res.status(201).json(user);
+        return res.status(201).json({
+            isSuccess: true,
+            isError: false,
+            user,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.signIn = async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+        const user = await authServices.loginService({ email, password });
+        res.status(200).json({
+            isSuccess: true,
+            isError: false,
+            ...user,
+        });
     } catch (err) {
         next(err);
     }

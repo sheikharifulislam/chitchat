@@ -13,6 +13,11 @@ const userSchema = Schema(
             unique: true,
             required: [true, "User email required"],
         },
+        avatar: {
+            type: String,
+            default: "https://cdn-icons-png.flaticon.com/512/21/21104.png",
+            required: true,
+        },
         password: {
             type: String,
             min: [8, "Must be at least 8 character"],

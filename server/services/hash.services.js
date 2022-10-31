@@ -5,12 +5,16 @@ exports.hashPassword = (password, salt) => {
     return bcrypt.hash(password, salt);
 };
 
-exports.generateToken = (data, privateKey, exp) => {
+exports.generateToken = (payload, privateKey, exp) => {
     return jwt.sign(
         {
-            data,
+            data: { ...payload },
         },
         privateKey,
         { expiresIn: exp }
     );
+};
+
+exports.comparePasword = (password, userPassword) => {
+    return bcrypt.compare(password, userPassword);
 };

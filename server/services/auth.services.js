@@ -12,3 +12,29 @@ exports.registerService = async (data) => {
     const hashPassword = await hashServices.hashPassword(data.password, salt);
     return userServices.createNewUser({ ...data, salt, password: hashPassword });
 };
+
+exports.loginService = async (data) => {
+    const user = await userServices.findUserByProperty("email", data.email);
+
+    if (!user) {
+        throw error("Email Or Password Invalid", 400);
+    }
+    const isMatch = await hashServices.comparePasword(data.password, user.password);
+
+    if (!isMatch) {
+        throw error("Email Or Password Invalid", 400);
+    }
+
+    const payload = {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        accountStatus: user.accountStatus,
+    };
+    const token = hashServices.generateToken(payload, process.env.JWT_KEY, 60 * 60 * 60);
+    return {
+        user,
+        token,
+    };
+};

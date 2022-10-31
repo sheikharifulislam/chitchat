@@ -4,10 +4,6 @@ const app = require("./app/app");
 const server = http.createServer(app);
 const connectDB = require("./db/db");
 
-app.get("/", (req, res) => {
-    res.send("hello world");
-});
-
 const port = process.env.PORT || 5000;
 connectDB("mongodb://localhost:27017/chitchat")
     .then(async () => {
