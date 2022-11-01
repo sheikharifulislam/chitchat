@@ -1,8 +1,9 @@
 const authServices = require("../services/auth.services");
 const emailServices = require("../services/email.services");
 const error = require("../utils/error");
-const emailTemplate = require("../template/email.template");
 const hashServices = require("../services/hash.services");
+const sendResponse = require("../utils/sendResponse");
+const transformResponse = require("../utils/transformResponse");
 
 exports.signUp = async (req, res, next) => {
     try {
@@ -10,17 +11,16 @@ exports.signUp = async (req, res, next) => {
 
         const user = await authServices.registerService({ ...req.body, token: verificationToken });
         if (!user) throw error();
+        delete user.password;
+        delete user.salt;
 
-        console.log(user);
         // let template = emailTemplate(verificationToken);
         // const { requestId } = await emailServices.sendEmail("Email verification", verificationToken, user.email);
-        // if (!requestId) throw error();
+        // if (!requestId) throw error();\
 
-        return res.status(201).json({
-            isSuccess: true,
-            isError: false,
-            user,
-        });
+        const response = transformResponse(["salt", "password"], user);
+
+        return res.status(201).json(sendResponse("user", response));
     } catch (err) {
         next(err);
     }
