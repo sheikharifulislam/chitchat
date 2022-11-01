@@ -35,6 +35,16 @@ const userSchema = Schema(
             default: "PENDING",
             required: true,
         },
+        sendRequest: {
+            type: [Schema.Types.ObjectId],
+            default: [],
+            required: true,
+        },
+        reciveRequest: {
+            type: [Schema.Types.ObjectId],
+            default: [],
+            required: true,
+        },
         salt: {
             type: Number,
             required: [true, ""],
