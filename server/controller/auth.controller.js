@@ -8,19 +8,15 @@ const transformResponse = require("../utils/transformResponse");
 exports.signUp = async (req, res, next) => {
     try {
         const verificationToken = hashServices.generateToken(req.body.email, process.env.JWT_KEY, 60 * 60 * 10);
-
-        const user = await authServices.registerService({ ...req.body, token: verificationToken });
+        let user = await authServices.registerService({ ...req.body, token: verificationToken });
         if (!user) throw error();
-        delete user.password;
-        delete user.salt;
 
-        // let template = emailTemplate(verificationToken);
         // const { requestId } = await emailServices.sendEmail("Email verification", verificationToken, user.email);
-        // if (!requestId) throw error();\
+        // if (!requestId) throw error();
 
         const response = transformResponse(["salt", "password"], user);
 
-        return res.status(201).json(sendResponse("user", response));
+        return res.status(201).json(sendResponse({ user: response }));
     } catch (err) {
         next(err);
     }
@@ -30,11 +26,19 @@ exports.signIn = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await authServices.loginService({ email, password });
-        res.status(200).json({
-            isSuccess: true,
-            isError: false,
-            ...user,
-        });
+        const payload = {
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            accountStatus: user.accountStatus,
+        };
+
+        const token = hashServices.generateToken(payload, process.env.JWT_KEY, 60 * 60 * 60);
+
+        const response = transformResponse(["salt", "password"], user);
+
+        res.status(200).json(sendResponse({ user: response, token }));
     } catch (err) {
         next(err);
     }

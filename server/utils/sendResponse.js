@@ -1,8 +1,8 @@
-function sendResponse(key, data) {
+function sendResponse(data = {}) {
     return {
         isSuccess: true,
         isError: false,
-        [key]: { ...data },
+        ...data,
     };
 }
 

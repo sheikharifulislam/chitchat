@@ -25,16 +25,5 @@ exports.loginService = async (data) => {
         throw error("Email Or Password Invalid", 400);
     }
 
-    const payload = {
-        _id: user._id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        accountStatus: user.accountStatus,
-    };
-    const token = hashServices.generateToken(payload, process.env.JWT_KEY, 60 * 60 * 60);
-    return {
-        user,
-        token,
-    };
+    return user;
 };
