@@ -9,7 +9,9 @@ exports.signUp = async (req, res, next) => {
     try {
         const verificationToken = hashServices.generateToken(req.body.email, process.env.JWT_KEY, 60 * 60 * 10);
         let user = await authServices.registerService({ ...req.body, token: verificationToken });
-        if (!user) throw error();
+        if (!user) {
+            throw error();
+        }
 
         // const { requestId } = await emailServices.sendEmail("Email verification", verificationToken, user.email);
         // if (!requestId) throw error();
