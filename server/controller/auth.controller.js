@@ -36,11 +36,18 @@ exports.signIn = async (req, res, next) => {
             accountStatus: user.accountStatus,
         };
 
-        const token = hashServices.generateToken(payload, process.env.JWT_KEY, 60 * 60 * 60);
+        const token = hashServices.generateToken(payload, process.env.JWT_KEY, 60 * 10);
 
         const response = transformResponse(["salt", "password"], user);
 
-        res.status(200).json(sendResponse({ user: response, token }));
+        res.cookie(process.env.ACCESS_TOKEN_NAME, token, {
+            path: "/",
+            maxAge: 10000,
+            httpOnly: true,
+            signed: true,
+        });
+
+        return res.status(200).json(sendResponse({ user: response, token }));
     } catch (err) {
         next(err);
     }

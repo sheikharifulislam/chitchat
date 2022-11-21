@@ -5,7 +5,7 @@ const server = http.createServer(app);
 const connectDB = require("./db/db");
 
 const port = process.env.PORT || 5000;
-connectDB("mongodb://localhost:27017/chitchat")
+connectDB(process.env.DB_URL)
     .then(async () => {
         console.log("Database connection established");
         server.listen(port, () => {
