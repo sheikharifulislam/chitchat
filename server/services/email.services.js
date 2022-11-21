@@ -1,7 +1,7 @@
 const { CourierClient } = require("@trycourier/courier");
 
 exports.sendEmail = (title, body, email) => {
-    const courier = CourierClient({ authorizationToken: process.env.AUTHORIZATION_TOKEN });
+    const courier = CourierClient({ authorizationToken: process.env.EMAIL_AUTHORIZATION_TOKEN });
     return courier.send({
         message: {
             content: {

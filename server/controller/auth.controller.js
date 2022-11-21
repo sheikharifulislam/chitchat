@@ -4,6 +4,7 @@ const error = require("../utils/error");
 const hashServices = require("../services/hash.services");
 const sendResponse = require("../utils/sendResponse");
 const transformResponse = require("../utils/transformResponse");
+const userServices = require("../services/user.services");
 
 exports.signUp = async (req, res, next) => {
     try {
@@ -50,5 +51,24 @@ exports.signIn = async (req, res, next) => {
         return res.status(200).json(sendResponse({ user: response, token }));
     } catch (err) {
         next(err);
+    }
+};
+
+exports.forgotPassword = async (req, res, next) => {
+    const { email } = req.body;
+    try {
+        const user = await userServices.findUserByProperty("email", email);
+        if (!user) {
+            throw error("Invalid Email Address", 400);
+        }
+
+        const resetTokenPayload = hashServices.RandomHashStr();
+        const resetToken = hashServices.generateToken(resetTokenPayload, process.env.JWT_KEY, 60 * 10);
+        const res = await userServices.updateUser({ email }, { resetToken });
+        if (!res) {
+            throw error();
+        }
+    } catch (error) {
+        next(error);
     }
 };

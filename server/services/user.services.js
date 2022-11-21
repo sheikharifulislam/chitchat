@@ -11,3 +11,7 @@ exports.findUserByProperty = (key, value) => {
 exports.createNewUser = (data) => {
     return new User({ ...data }).save();
 };
+
+exports.updateUser = (filter, data) => {
+    return User.updateOne(filter, data);
+};
