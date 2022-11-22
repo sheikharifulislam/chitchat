@@ -5,17 +5,25 @@ const hashServices = require("../services/hash.services");
 const sendResponse = require("../utils/sendResponse");
 const transformResponse = require("../utils/transformResponse");
 const userServices = require("../services/user.services");
+const emailVerificationTemplate = require("../template/email.template");
 
 exports.signUp = async (req, res, next) => {
     try {
         const verificationToken = hashServices.generateToken(req.body.email, process.env.JWT_KEY, 60 * 60 * 10);
-        let user = await authServices.registerService({ ...req.body, token: verificationToken });
+        let user = await authServices.registerService({ ...req.body, verifyToken: verificationToken });
+
         if (!user) {
             throw error();
         }
 
-        // const { requestId } = await emailServices.sendEmail("Email verification", verificationToken, user.email);
-        // if (!requestId) throw error();
+        const result = await emailServices.sendEmail(
+            user.email,
+            "Email verification",
+            emailVerificationTemplate(verificationToken)
+        );
+        //if (!requestId) throw error();
+
+        console.log(result);
 
         const response = transformResponse(["salt", "password"], user);
 

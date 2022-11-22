@@ -49,6 +49,10 @@ const userSchema = Schema(
             type: Number,
             required: [true, ""],
         },
+        verifyToken: {
+            type: String,
+            required: true,
+        },
         refreshToken: {
             type: String,
         },

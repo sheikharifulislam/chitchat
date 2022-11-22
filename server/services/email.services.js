@@ -1,17 +1,24 @@
-const { CourierClient } = require("@trycourier/courier");
+const nodemailer = require("nodemailer");
 
-exports.sendEmail = (title, body, email) => {
-    const courier = CourierClient({ authorizationToken: process.env.EMAIL_AUTHORIZATION_TOKEN });
-    return courier.send({
-        message: {
-            content: {
-                title,
-                body: `Please Click The Link ${process.env.CLIENT_BASE_URL}verify/?token=${body} `,
-            },
+var transport = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "sheikharifulislam700@gmail.com",
+        pass: "riskmqkycuudipxm",
+    },
+});
 
-            to: {
-                email,
-            },
-        },
-    });
+exports.sendEmail = (to, subject, body) => {
+    try {
+        const mailOptions = {
+            from: "sheikharifulislam700@gmail.com",
+            to,
+            subject,
+            html: body,
+        };
+
+        return transport.sendMail(mailOptions);
+    } catch (error) {
+        console.log(error.message);
+    }
 };
