@@ -23,3 +23,7 @@ exports.comparePasword = (password, userPassword) => {
 exports.RandomHashStr = () => {
     return CryptoJS.algo.SHA256.create().finalize();
 };
+
+exports.verifyJwt = (token, secretKey) => {
+    return jwt.verify(token, secretKey);
+};

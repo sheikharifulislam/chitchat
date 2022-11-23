@@ -20,15 +20,12 @@ exports.signUp = async (req, res, next) => {
         const result = await emailServices.sendEmail(
             user.email,
             "Email verification",
-            emailVerificationTemplate(verificationToken)
+            emailVerificationTemplate(`Bearer ${verificationToken}`)
         );
 
         if (!result.messageId) {
             throw error();
         }
-        //if (!requestId) throw error();
-
-        console.log(result);
 
         const response = transformResponse(["salt", "password"], user);
 
@@ -61,7 +58,7 @@ exports.signIn = async (req, res, next) => {
             signed: true,
         });
 
-        return res.status(200).json(sendResponse({ user: response, token }));
+        return res.status(200).json(sendResponse({ user: response, token: `Bearer ${token}` }));
     } catch (err) {
         next(err);
     }
@@ -86,7 +83,7 @@ exports.forgotPassword = async (req, res, next) => {
         const emailRes = await emailServices.sendEmail(
             user.email,
             "Forgot Password",
-            forgotPasswordTemplate(resetToken)
+            forgotPasswordTemplate(`Bearer ${resetToken}`)
         );
 
         if (!emailRes.messageId) {
@@ -96,6 +93,29 @@ exports.forgotPassword = async (req, res, next) => {
         res.status(200).json({
             message: "If your email address is in our system, the email will send to you",
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.verifyForgotPassword = async (req, res, next) => {
+    const { token } = req;
+    console.log(token);
+    try {
+        const user = await userServices.updateUser(
+            { forgotPasswordToken: token },
+            {
+                $unset: {
+                    forgotPasswordToken: "",
+                },
+            }
+        );
+
+        if (!user) {
+            throw error("Invalid Token", 401);
+        }
+
+        res.status(200).send();
     } catch (error) {
         next(error);
     }
