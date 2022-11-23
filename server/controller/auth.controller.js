@@ -5,7 +5,8 @@ const hashServices = require("../services/hash.services");
 const sendResponse = require("../utils/sendResponse");
 const transformResponse = require("../utils/transformResponse");
 const userServices = require("../services/user.services");
-const emailVerificationTemplate = require("../template/email.template");
+const emailVerificationTemplate = require("../template/verifyEmail.template");
+const forgotPasswordTemplate = require("../template/forgotPassword.template");
 
 exports.signUp = async (req, res, next) => {
     try {
@@ -21,6 +22,10 @@ exports.signUp = async (req, res, next) => {
             "Email verification",
             emailVerificationTemplate(verificationToken)
         );
+
+        if (!result.messageId) {
+            throw error();
+        }
         //if (!requestId) throw error();
 
         console.log(result);
@@ -67,15 +72,30 @@ exports.forgotPassword = async (req, res, next) => {
     try {
         const user = await userServices.findUserByProperty("email", email);
         if (!user) {
-            throw error("Invalid Email Address", 400);
+            throw error("Invalid Email Address", 401);
         }
 
         const resetTokenPayload = hashServices.RandomHashStr();
         const resetToken = hashServices.generateToken(resetTokenPayload, process.env.JWT_KEY, 60 * 10);
-        const res = await userServices.updateUser({ email }, { resetToken });
-        if (!res) {
+        const updatedUser = await userServices.updateUser({ email }, { forgotPasswordToken: resetToken });
+
+        if (!updatedUser.modifiedCount) {
             throw error();
         }
+
+        const emailRes = await emailServices.sendEmail(
+            user.email,
+            "Forgot Password",
+            forgotPasswordTemplate(resetToken)
+        );
+
+        if (!emailRes.messageId) {
+            throw error();
+        }
+
+        res.status(200).json({
+            message: "If your email address is in our system, the email will send to you",
+        });
     } catch (error) {
         next(error);
     }

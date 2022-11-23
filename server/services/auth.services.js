@@ -19,6 +19,11 @@ exports.loginService = async (data) => {
     if (!user) {
         throw error("Email Or Password Invalid", 400);
     }
+
+    if (user.accountStatus !== "ACTIVE") {
+        throw error("Please Verify Your Email Address", 401);
+    }
+
     const isMatch = await hashServices.comparePasword(data.password, user.password);
 
     if (!isMatch) {

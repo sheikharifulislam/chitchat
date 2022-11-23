@@ -56,7 +56,7 @@ const userSchema = Schema(
         refreshToken: {
             type: String,
         },
-        resetToken: {
+        forgotPasswordToken: {
             type: String,
         },
         isOnline: {
