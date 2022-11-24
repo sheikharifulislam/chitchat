@@ -20,7 +20,7 @@ exports.signUp = async (req, res, next) => {
         const result = await emailServices.sendEmail(
             user.email,
             "Email verification",
-            emailVerificationTemplate(`Bearer ${verificationToken}`)
+            emailVerificationTemplate(verificationToken)
         );
 
         if (!result.messageId) {
@@ -58,9 +58,31 @@ exports.signIn = async (req, res, next) => {
             signed: true,
         });
 
-        return res.status(200).json(sendResponse({ user: response, token: `Bearer ${token}` }));
+        return res.status(200).json(sendResponse({ user: response, token }));
     } catch (err) {
         next(err);
+    }
+};
+
+exports.verifyEmail = async (req, res, next) => {
+    const { token } = req;
+
+    try {
+        await userServices.updateUser(
+            { verifyToken: token },
+            {
+                $set: {
+                    accountStatus: "ACTIVE",
+                },
+                $unset: {
+                    verifyToken: "",
+                },
+            }
+        );
+
+        res.status(200).send();
+    } catch (error) {
+        next(error);
     }
 };
 
@@ -83,7 +105,7 @@ exports.forgotPassword = async (req, res, next) => {
         const emailRes = await emailServices.sendEmail(
             user.email,
             "Forgot Password",
-            forgotPasswordTemplate(`Bearer ${resetToken}`)
+            forgotPasswordTemplate(resetToken)
         );
 
         if (!emailRes.messageId) {
