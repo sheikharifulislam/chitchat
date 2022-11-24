@@ -98,15 +98,21 @@ exports.forgotPassword = async (req, res, next) => {
     }
 };
 
-exports.verifyForgotPassword = async (req, res, next) => {
+exports.resetPassword = async (req, res, next) => {
     const { token } = req;
-    console.log(token);
+    const { password } = req.body;
     try {
+        const salt = Math.floor(Math.random() * 10);
+        const hashPassword = await hashServices.hashPassword(password, salt);
         const user = await userServices.updateUser(
             { forgotPasswordToken: token },
             {
                 $unset: {
                     forgotPasswordToken: "",
+                },
+                $set: {
+                    password: hashPassword,
+                    salt,
                 },
             }
         );
