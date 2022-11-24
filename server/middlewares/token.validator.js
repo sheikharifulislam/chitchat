@@ -1,5 +1,3 @@
-const jwt = require("jsonwebtoken");
-
 const tokenValidator = async (req, res, next) => {
     try {
         let token = req.headers.authorization;
@@ -11,8 +9,6 @@ const tokenValidator = async (req, res, next) => {
         }
 
         token = token.split(" ")[1];
-
-        jwt.verify(token, process.env.JWT_KEY);
         req.token = token;
         next();
     } catch (error) {

@@ -10,8 +10,9 @@ const forgotPasswordTemplate = require("../template/forgotPassword.template");
 
 exports.signUp = async (req, res, next) => {
     try {
-        const verificationToken = hashServices.generateToken(req.body.email, process.env.JWT_KEY, 60 * 60 * 10);
-        let user = await authServices.registerService({ ...req.body, verifyToken: verificationToken });
+        const verificationToken = hashServices.hashToken(req.body.email);
+
+        let user = await authServices.registerService({ ...req.body, verifyToken: { token: verificationToken } });
 
         if (!user) {
             throw error();
@@ -68,8 +69,13 @@ exports.verifyEmail = async (req, res, next) => {
     const { token } = req;
 
     try {
+        const user = await userServices.findUserByProperty("verifyToken.token", token);
+        if (Date.now() > parseInt(user.verifyToken.date)) {
+            throw error("Invalid token", 401);
+        }
+
         await userServices.updateUser(
-            { verifyToken: token },
+            { "verifyToken.token": token },
             {
                 $set: {
                     accountStatus: "ACTIVE",
@@ -93,14 +99,9 @@ exports.forgotPassword = async (req, res, next) => {
         if (!user) {
             throw error("Invalid Email Address", 401);
         }
-
-        const resetTokenPayload = hashServices.RandomHashStr();
-        const resetToken = hashServices.generateToken(resetTokenPayload, process.env.JWT_KEY, 60 * 10);
-        const updatedUser = await userServices.updateUser({ email }, { forgotPasswordToken: resetToken });
-
-        if (!updatedUser.modifiedCount) {
-            throw error();
-        }
+        const resetToken = hashServices.hashToken(user.email);
+        user.forgotPasswordToken = { token: resetToken };
+        await user.save();
 
         const emailRes = await emailServices.sendEmail(
             user.email,

@@ -1,6 +1,8 @@
 const { Schema, model } = require("mongoose");
+const EmailTokenSchema = require("./subDocument/emailToken.schema");
+const forgotPasswordTokenSchema = require("./subDocument/forgotPasswordToken.schema");
 
-const userSchema = Schema(
+const userSchema = new Schema(
     {
         name: {
             type: String,
@@ -50,14 +52,13 @@ const userSchema = Schema(
             required: [true, ""],
         },
         verifyToken: {
-            type: String,
-            required: true,
+            type: EmailTokenSchema,
         },
         refreshToken: {
             type: String,
         },
         forgotPasswordToken: {
-            type: String,
+            type: forgotPasswordTokenSchema,
         },
         isOnline: {
             type: Boolean,
