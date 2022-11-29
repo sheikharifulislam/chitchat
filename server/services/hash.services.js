@@ -25,5 +25,5 @@ exports.verifyJwt = (token, secretKey) => {
 };
 
 exports.hashToken = (data) => {
-    return CryptoJS.SHA512(data);
+    return CryptoJS.SHA512(data).toString();
 };

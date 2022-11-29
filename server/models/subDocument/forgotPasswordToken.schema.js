@@ -5,8 +5,8 @@ const forgotPasswordTokenSchema = new Schema({
         type: String,
     },
     date: {
-        type: String,
-        default: Date.now() * 60000 * 15,
+        type: Date,
+        default: Date.now() + 60000 * 15,
     },
 });
 

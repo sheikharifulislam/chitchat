@@ -1,5 +1,4 @@
 const forgotPasswordTemplate = (token) => {
-    console.log(token);
     return `
     <!DOCTYPE html>
     <html>

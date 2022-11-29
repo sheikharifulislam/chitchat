@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/User.model");
 
 exports.findUserByProperty = (key, value) => {
     if (key === "id") {

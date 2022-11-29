@@ -1,6 +1,6 @@
 const tokenValidator = async (req, res, next) => {
     try {
-        let token = req.headers.authorization;
+        let token = req.headers["verify-token"];
 
         if (!token) {
             return res.status(401).json({
