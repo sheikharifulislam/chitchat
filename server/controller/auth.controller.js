@@ -157,3 +157,8 @@ exports.resetPassword = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.logout = () => {
+    res.clerarCookie(process.env.ACCESS_TOKEN_NAME);
+    res.status(200).send();
+};
